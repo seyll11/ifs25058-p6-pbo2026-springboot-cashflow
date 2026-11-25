@@ -1,0 +1,60 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Extract Assignment Text",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"-e",
+				"const fs=require('fs'); const s=fs.readFileSync('C:\\\\Users\\\\ASUS\\\\Downloads\\\\pbo-2026-p6.html','utf8'); const b=s.match(/<div id='write'[^>]*>([\\s\\S]*?)<\\/div>/i)?.[1]||s; let t=b.replace(/<br\\s*\\/?>/gi,'\\n').replace(/<\\/p>/gi,'\\n').replace(/<\\/li>/gi,'\\n').replace(/<\\/tr>/gi,'\\n').replace(/<\\/?t[dh][^>]*>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,\"'\").replace(/[ \\t]+/g,' ').replace(/\\n\\s*\\n/g,'\\n').replace(/\\s+\\n/g,'\\n'); console.log(t);"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Extract PBO Module",
+			"type": "shell",
+			"command": "cscript",
+			"args": [
+				"//nologo",
+				"C:\\Users\\ASUS\\.copilot\\session-state\\ab8e3480-c810-4dff-be57-e9add4ecfca4\\files\\extract-pbo.vbs"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Extract PBO Module Absolute",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\cscript.exe",
+			"args": [
+				"//nologo",
+				"C:\\Users\\ASUS\\.copilot\\session-state\\ab8e3480-c810-4dff-be57-e9add4ecfca4\\files\\extract-pbo.vbs"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Extract PBO Module Fixed",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\cscript.exe",
+			"args": [
+				"//nologo",
+				"C:\\Users\\ASUS\\.copilot\\session-state\\ab8e3480-c810-4dff-be57-e9add4ecfca4\\files\\extract-pbo.vbs"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Extract Cashflow Section",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\cscript.exe",
+			"args": [
+				"//nologo",
+				"C:\\Users\\ASUS\\.copilot\\session-state\\ab8e3480-c810-4dff-be57-e9add4ecfca4\\files\\extract-pbo.vbs"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
