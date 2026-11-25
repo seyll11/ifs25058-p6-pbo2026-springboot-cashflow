@@ -2,9 +2,9 @@ spring:
   application:
     name: ifs25058-p6-pbo2026-springboot-cashflow
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_DATABASE:pbo2026_cashflow}}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   sql:
     init:
@@ -20,6 +20,11 @@ spring:
 
 server:
   port: ${APP_PORT:${PORT:8080}}
+  # Kompres respons teks agar halaman dimuat lebih cepat
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: text/html,text/css,text/javascript,application/javascript,application/json,application/manifest+json,image/svg+xml
   servlet:
     session:
       timeout: 8h
