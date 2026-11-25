@@ -26,6 +26,9 @@ import java.util.Optional;
  */
 public class OpenAiFinanceService implements IFinanceAiService {
 
+    /** Model bawaan jika OPENAI_MODEL kosong (Gemini lewat endpoint OpenAI-compatible). */
+    static final String DEFAULT_MODEL = "gemini-2.5-flash";
+
     private final String endpoint;
     private final String apiKey;
     private final String model;
@@ -78,10 +81,23 @@ public class OpenAiFinanceService implements IFinanceAiService {
         }
 
         if (response.statusCode() != 200) {
-            throw new DomainException("Layanan AI mengembalikan error (" + response.statusCode() + "): " + response.body());
+            throw new DomainException(describeHttpError(response.statusCode()));
         }
 
         return parseAiResponse(response.body());
+    }
+
+    /** Menerjemahkan status HTTP menjadi pesan yang ramah pengguna (tanpa membocorkan body mentah). */
+    private String describeHttpError(int status) {
+        return switch (status) {
+            case 400 -> "Permintaan ke layanan AI ditolak. Periksa OPENAI_MODEL dan isi catatan Anda";
+            case 401, 403 -> "API key AI tidak valid atau tidak punya akses. Periksa OPENAI_KEY di file .env";
+            case 404 -> "Endpoint atau model AI tidak ditemukan. Periksa OPENAI_ENDPOINT dan OPENAI_MODEL";
+            case 429 -> "Batas penggunaan AI tercapai. Coba lagi beberapa saat lagi";
+            default -> status >= 500
+                    ? "Server AI sedang bermasalah (" + status + "). Coba lagi nanti"
+                    : "Layanan AI mengembalikan error (" + status + ")";
+        };
     }
 
     private String normalizeEndpoint(String ep) {
@@ -103,7 +119,7 @@ public class OpenAiFinanceService implements IFinanceAiService {
                     + "Contoh format: [{\"description\":\"Gaji bulanan\",\"amount\":5000000,\"type\":\"INCOME\"},"
                     + "{\"description\":\"Makan siang\",\"amount\":25000,\"type\":\"EXPENSE\"}]";
 
-            String selectedModel = (model == null || model.isBlank()) ? "gpt-4o-mini" : model.trim();
+            String selectedModel = (model == null || model.isBlank()) ? DEFAULT_MODEL : model.trim();
             Map<String, Object> payload = Map.of(
                     "model", selectedModel,
                     "messages", List.of(

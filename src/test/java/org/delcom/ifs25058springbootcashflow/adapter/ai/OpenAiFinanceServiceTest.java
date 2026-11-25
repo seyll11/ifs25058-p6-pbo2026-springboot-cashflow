@@ -156,7 +156,24 @@ class OpenAiFinanceServiceTest {
         mockResponseBody = "Internal Server Error";
 
         DomainException ex = assertThrows(DomainException.class, () -> service().generateTransactions("Catatan"));
-        assertNotNull(ex.getMessage());
+        assertEquals("Server AI sedang bermasalah (500). Coba lagi nanti", ex.getMessage());
+    }
+
+    @Test
+    void mapsHttpStatusToFriendlyMessages() {
+        assertEquals("Permintaan ke layanan AI ditolak. Periksa OPENAI_MODEL dan isi catatan Anda", errorFor(400));
+        assertEquals("API key AI tidak valid atau tidak punya akses. Periksa OPENAI_KEY di file .env", errorFor(401));
+        assertEquals("API key AI tidak valid atau tidak punya akses. Periksa OPENAI_KEY di file .env", errorFor(403));
+        assertEquals("Endpoint atau model AI tidak ditemukan. Periksa OPENAI_ENDPOINT dan OPENAI_MODEL", errorFor(404));
+        assertEquals("Batas penggunaan AI tercapai. Coba lagi beberapa saat lagi", errorFor(429));
+        assertEquals("Layanan AI mengembalikan error (418)", errorFor(418));
+    }
+
+    private String errorFor(int status) {
+        mockResponseCode = status;
+        mockResponseBody = "{\"error\":\"detail rahasia\"}";
+        DomainException ex = assertThrows(DomainException.class, () -> service().generateTransactions("Catatan"));
+        return ex.getMessage();
     }
 
     @Test

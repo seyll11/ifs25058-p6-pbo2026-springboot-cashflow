@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -403,13 +404,12 @@ public class FinanceView extends VerticalLayout {
                 try {
                     return financeAiUseCase.generateTransactions(prompt);
                 } catch (DomainException ex) {
-                    throw new RuntimeException(ex);
+                    throw new CompletionException(ex);
                 }
             }).whenComplete((result, error) -> ui.access(() -> {
                 try {
                     if (error != null) {
-                        Throwable cause = error.getCause() != null ? error.getCause() : error;
-                        showError("Gagal menghasilkan transaksi AI: " + cause.getMessage());
+                        showError("Gagal menghasilkan transaksi AI: " + aiErrorMessage(error));
                         return;
                     }
                     generatedItems.clear();
@@ -744,5 +744,14 @@ public class FinanceView extends VerticalLayout {
     private void showError(String message) {
         Notification notification = Notification.show(message, 4000, Notification.Position.BOTTOM_START);
         notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+    }
+
+    /** Mengambil pesan DomainException dari rantai exception agar tidak menampilkan nama kelas Java ke pengguna. */
+    private static String aiErrorMessage(Throwable error) {
+        Throwable cause = error;
+        while (cause != null && !(cause instanceof DomainException)) {
+            cause = cause.getCause();
+        }
+        return cause != null ? cause.getMessage() : "Terjadi kesalahan tak terduga. Silakan coba lagi.";
     }
 }

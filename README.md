@@ -31,7 +31,7 @@ config/      AppConfig (composition root)
 Prasyarat: JDK 25, PostgreSQL, Maven Wrapper.
 
 ```powershell
-Copy-Item .env.example .env   # sesuaikan DB_* dan OPENAI_*
+Copy-Item .env.example .env   # sesuaikan DB_* dan OPENAI_* (API key Gemini dari https://aistudio.google.com/apikey)
 .\mvnw.cmd spring-boot:run
 ```
 
