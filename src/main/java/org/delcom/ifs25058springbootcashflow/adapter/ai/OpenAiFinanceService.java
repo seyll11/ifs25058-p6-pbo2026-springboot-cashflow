@@ -27,19 +27,30 @@ import java.util.Optional;
 public class OpenAiFinanceService implements IFinanceAiService {
 
     /** Model bawaan jika OPENAI_MODEL kosong (Gemini lewat endpoint OpenAI-compatible). */
-    static final String DEFAULT_MODEL = "gemini-2.5-flash";
+    static final String DEFAULT_MODEL = "gemini-3.8-flash";
+
+    /** Jumlah maksimal percobaan jika server AI sibuk (429/503). */
+    static final int MAX_ATTEMPTS = 3;
+    private static final long DEFAULT_RETRY_DELAY_MILLIS = 1500;
 
     private final String endpoint;
     private final String apiKey;
     private final String model;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
+    private final long retryDelayMillis;
 
     public OpenAiFinanceService(String endpoint, String apiKey, String model) {
         this(endpoint, apiKey, model, HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(15)).build(), new ObjectMapper());
     }
 
     public OpenAiFinanceService(String endpoint, String apiKey, String model, HttpClient httpClient, ObjectMapper objectMapper) {
+        this(endpoint, apiKey, model, httpClient, objectMapper, DEFAULT_RETRY_DELAY_MILLIS);
+    }
+
+    OpenAiFinanceService(String endpoint, String apiKey, String model, HttpClient httpClient,
+                         ObjectMapper objectMapper, long retryDelayMillis) {
+        this.retryDelayMillis = retryDelayMillis;
         this.endpoint = endpoint;
         this.apiKey = apiKey;
         this.model = model;
@@ -70,21 +81,35 @@ public class OpenAiFinanceService implements IFinanceAiService {
                 .POST(HttpRequest.BodyPublishers.ofString(requestJson))
                 .build();
 
-        HttpResponse<String> response;
-        try {
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new DomainException("Pemanggilan API AI terinterupsi: " + e.getMessage());
-        } catch (IOException e) {
-            throw new DomainException("Gagal menghubungi server AI: " + e.getMessage());
-        }
+        HttpResponse<String> response = sendWithRetry(request);
 
         if (response.statusCode() != 200) {
             throw new DomainException(describeHttpError(response.statusCode()));
         }
 
         return parseAiResponse(response.body());
+    }
+
+    /** Mengirim request; jika server AI sibuk (429/503) dicoba lagi hingga MAX_ATTEMPTS dengan jeda bertambah. */
+    private HttpResponse<String> sendWithRetry(HttpRequest request) throws DomainException {
+        for (int attempt = 1; ; attempt++) {
+            try {
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                if (!isRetryable(response.statusCode()) || attempt >= MAX_ATTEMPTS) {
+                    return response;
+                }
+                Thread.sleep(retryDelayMillis * attempt);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new DomainException("Pemanggilan API AI terinterupsi: " + e.getMessage());
+            } catch (IOException e) {
+                throw new DomainException("Gagal menghubungi server AI: " + e.getMessage());
+            }
+        }
+    }
+
+    private static boolean isRetryable(int status) {
+        return status == 429 || status == 503;
     }
 
     /** Menerjemahkan status HTTP menjadi pesan yang ramah pengguna (tanpa membocorkan body mentah). */

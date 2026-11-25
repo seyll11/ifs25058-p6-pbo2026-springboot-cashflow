@@ -34,13 +34,16 @@ class OpenAiFinanceServiceTest {
     private String serverUrl;
     private String mockResponseBody;
     private int mockResponseCode;
+    private int failuresBeforeSuccess;
+    private int requestCount;
 
     @BeforeEach
     void setUp() throws IOException {
         server = HttpServer.create(new InetSocketAddress(0), 0);
         server.createContext("/chat/completions", exchange -> {
             byte[] bytes = mockResponseBody != null ? mockResponseBody.getBytes(StandardCharsets.UTF_8) : new byte[0];
-            exchange.sendResponseHeaders(mockResponseCode, bytes.length);
+            int code = requestCount++ < failuresBeforeSuccess ? 503 : mockResponseCode;
+            exchange.sendResponseHeaders(code, bytes.length);
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(bytes);
             }
@@ -48,6 +51,8 @@ class OpenAiFinanceServiceTest {
         server.start();
         serverUrl = "http://localhost:" + server.getAddress().getPort();
         mockResponseCode = 200;
+        failuresBeforeSuccess = 0;
+        requestCount = 0;
     }
 
     @AfterEach
@@ -64,7 +69,8 @@ class OpenAiFinanceServiceTest {
     }
 
     private OpenAiFinanceService service() {
-        return new OpenAiFinanceService(serverUrl, "valid-key", "test-model");
+        return new OpenAiFinanceService(serverUrl, "valid-key", "test-model",
+                HttpClient.newHttpClient(), new ObjectMapper(), 0);
     }
 
     @Test
@@ -167,6 +173,25 @@ class OpenAiFinanceServiceTest {
         assertEquals("Endpoint atau model AI tidak ditemukan. Periksa OPENAI_ENDPOINT dan OPENAI_MODEL", errorFor(404));
         assertEquals("Batas penggunaan AI tercapai. Coba lagi beberapa saat lagi", errorFor(429));
         assertEquals("Layanan AI mengembalikan error (418)", errorFor(418));
+    }
+
+    @Test
+    void retriesWhenServerIsBusyThenSucceeds() throws Exception {
+        failuresBeforeSuccess = 2;
+        mockResponseBody = chatResponse("[{\"description\":\"Gaji\",\"amount\":5000000,\"type\":\"INCOME\"}]");
+
+        assertEquals(1, service().generateTransactions("Catatan").size());
+        assertEquals(3, requestCount);
+    }
+
+    @Test
+    void givesUpAfterMaxAttemptsWhenServerStaysBusy() {
+        failuresBeforeSuccess = 10;
+        mockResponseBody = "busy";
+
+        DomainException ex = assertThrows(DomainException.class, () -> service().generateTransactions("Catatan"));
+        assertEquals("Server AI sedang bermasalah (503). Coba lagi nanti", ex.getMessage());
+        assertEquals(OpenAiFinanceService.MAX_ATTEMPTS, requestCount);
     }
 
     private String errorFor(int status) {
