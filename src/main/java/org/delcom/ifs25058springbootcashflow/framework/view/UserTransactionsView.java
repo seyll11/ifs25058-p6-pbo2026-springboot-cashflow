@@ -6,6 +6,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Meta;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.BeforeEvent;
@@ -28,6 +29,7 @@ import org.delcom.ifs25058springbootcashflow.usecase.UserUseCase;
  */
 @Route(value = "user-transactions", layout = MainLayout.class)
 @PageTitle("Transaksi Pengguna")
+@Meta(name = "description", content = "Lihat transaksi Cashflow milik pengguna tertentu.")
 public class UserTransactionsView extends VerticalLayout implements HasUrlParameter<Integer>, BeforeEnterObserver {
 
     private final UserUseCase userUseCase;

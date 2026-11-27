@@ -9,6 +9,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Meta;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -19,6 +20,7 @@ import org.delcom.ifs25058springbootcashflow.usecase.UserUseCase;
 
 @Route(value = "users", layout = MainLayout.class)
 @PageTitle("Daftar Pengguna")
+@Meta(name = "description", content = "Daftar pengguna aplikasi Cashflow untuk administrator.")
 public class UsersView extends VerticalLayout implements BeforeEnterObserver {
 
     public UsersView(UserUseCase userUseCase) {

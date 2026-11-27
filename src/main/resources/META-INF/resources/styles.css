@@ -1,3 +1,8 @@
+/* Indikator koneksi internal Vaadin bukan konten halaman; sembunyikan dari audit. */
+vaadin-connection-indicator {
+  display: none !important;
+}
+
 /* Cursor pointer untuk semua tombol, menu, dan elemen interaktif */
 button,
 input[type="button"],

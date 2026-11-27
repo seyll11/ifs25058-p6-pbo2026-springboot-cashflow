@@ -1,12 +1,14 @@
 package org.delcom.ifs25058springbootcashflow.framework.view;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -35,6 +37,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver, AfterN
     private final Image headerAvatarImage = new Image();
     private final Span headerAvatarInitial = new Span();
     private final Div headerAvatar = new Div();
+    private final Main contentArea = new Main();
 
     private record NavEntry(RouterLink link, String pathPrefix) {
     }
@@ -43,6 +46,12 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver, AfterN
         this.userRepository = userRepository;
         setPrimarySection(Section.DRAWER);
         AuthSession.currentUser(userRepository);
+
+        // Bungkus semua view bertema dengan satu landmark <main>.
+        contentArea.setSizeFull();
+        contentArea.getStyle().set("box-sizing", "border-box");
+        setContent(contentArea);
+
         createHeader();
         createDrawer();
     }
@@ -61,6 +70,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver, AfterN
         header.getStyle()
                 .set("background", "#FFFFFF")
                 .set("border-bottom", "1px solid #E5E7EB");
+        header.getElement().setAttribute("role", "banner");
         addToNavbar(header);
     }
 
@@ -231,6 +241,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver, AfterN
         drawer.getStyle()
                 .set("background", "#FFFFFF")
                 .set("border-right", "1px solid #E5E7EB");
+        drawer.getElement().setAttribute("role", "navigation");
 
         Div brand = new Div();
         brand.getStyle()
@@ -361,6 +372,16 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver, AfterN
     public void afterNavigation(AfterNavigationEvent event) {
         highlightActive(event.getLocation().getPath());
         refreshHeaderAvatar(AuthSession.currentUser(userRepository).orElse(null));
+    }
+
+    @Override
+    public void showRouterLayoutContent(HasElement content) {
+        // RouterLayout default mengganti isi AppLayout; kita masukkan ke <main>
+        // agar axe melihat satu landmark utama di semua halaman terlindungi.
+        contentArea.getElement().removeAllChildren();
+        if (content != null) {
+            contentArea.getElement().appendChild(content.getElement());
+        }
     }
 
     @Override
