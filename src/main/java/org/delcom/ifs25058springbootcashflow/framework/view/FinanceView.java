@@ -238,7 +238,7 @@ public class FinanceView extends VerticalLayout {
         Span label = new Span(presenter.formatMoney(transaction.getAmount()));
         label.getStyle()
                 .set("font-weight", "600")
-                .set("color", transaction.isIncome() ? INCOME_COLOR : EXPENSE_COLOR);
+                .set("color", transaction.isIncome() ? "#166534" : "#991B1B");
         return label;
     }
 
