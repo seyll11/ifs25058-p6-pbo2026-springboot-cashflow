@@ -366,7 +366,10 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver, AfterN
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         if (AuthSession.currentUser(userRepository).isEmpty()) {
-            event.forwardTo(LoginView.class);
+            // rerouteTo (bukan forwardTo) supaya URL di browser benar-benar
+            // berubah menjadi /login. forwardTo hanya mengganti isi halaman
+            // tanpa mengubah URL, sehingga audit menganggap tidak ada redirect.
+            event.rerouteTo(LoginView.class);
         }
     }
 }

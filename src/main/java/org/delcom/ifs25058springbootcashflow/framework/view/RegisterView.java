@@ -29,7 +29,7 @@ public class RegisterView extends VerticalLayout {
 
     public RegisterView(AuthUseCase authUseCase, IUserRepository userRepository) {
         if (AuthSession.currentUser(userRepository).isPresent()) {
-            UI.getCurrent().navigate(FinanceView.class);
+            UI.getCurrent().getPage().setLocation("/profile");
             return;
         }
 
@@ -62,7 +62,8 @@ public class RegisterView extends VerticalLayout {
             try {
                 User user = authUseCase.register(username.getValue(), password.getValue(), fullName.getValue());
                 AuthSession.login(user);
-                UI.getCurrent().navigate(FinanceView.class);
+                // Redirect penuh agar URL dan cookie sesi langsung sinkron.
+                UI.getCurrent().getPage().setLocation("/profile");
             } catch (ValidationException ex) {
                 loadingBar.setVisible(false);
                 registerButton.setEnabled(true);
