@@ -13,7 +13,6 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Meta;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -34,7 +33,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Route(value = "profile", layout = MainLayout.class)
 @PageTitle("Profil")
-@Meta(name = "description", content = "Lihat dan perbarui profil akun Cashflow Anda.")
 public class ProfileView extends VerticalLayout {
 
     private final UserUseCase userUseCase;

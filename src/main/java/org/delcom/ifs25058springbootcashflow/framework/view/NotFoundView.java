@@ -4,7 +4,6 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Meta;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.ErrorParameter;
 import com.vaadin.flow.router.HasErrorParameter;
@@ -17,7 +16,6 @@ import com.vaadin.flow.router.RouterLink;
  * supaya audit aksesibilitas tidak menemukan dokumen kosong.
  */
 @PageTitle("Halaman Tidak Ditemukan")
-@Meta(name = "description", content = "Halaman yang Anda cari tidak ditemukan di aplikasi Cashflow.")
 public class NotFoundView extends VerticalLayout implements HasErrorParameter<NotFoundException> {
 
     public NotFoundView() {

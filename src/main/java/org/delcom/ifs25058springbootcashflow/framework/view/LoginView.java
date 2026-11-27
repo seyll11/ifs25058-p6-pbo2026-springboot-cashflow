@@ -10,7 +10,6 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Meta;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -26,7 +25,6 @@ import org.delcom.ifs25058springbootcashflow.usecase.AuthUseCase;
 
 @Route("login")
 @PageTitle("Login")
-@Meta(name = "description", content = "Masuk ke akun Cashflow untuk mengelola keuangan pribadi.")
 public class LoginView extends VerticalLayout {
 
     public LoginView(AuthUseCase authUseCase, IUserRepository userRepository) {

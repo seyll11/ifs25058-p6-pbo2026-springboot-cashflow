@@ -16,7 +16,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Meta;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -54,7 +53,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Route(value = "", layout = MainLayout.class)
 @PageTitle("Cashflow")
-@Meta(name = "description", content = "Kelola dan pantau pemasukan, pengeluaran, serta saldo cashflow pribadi Anda.")
 public class FinanceView extends VerticalLayout {
 
     private static final String EMPTY_MESSAGE = "- Data transaksi belum tersedia!";
